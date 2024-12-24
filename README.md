@@ -1,2 +1,3 @@
-# TL-Glow-Curve-Deconvolution
-Thermoluminescence Glow Curve Deconvolution
+# TL Glow Curve Deconvolution
+
+Thermoluminescence glow curve deconvolution by minimising the figure of merit using numerical methods.
