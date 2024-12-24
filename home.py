@@ -130,9 +130,9 @@ def update_n() -> None:
 
 warnings.filterwarnings("ignore")
 
-st.set_page_config("Thermoluminescence Glow Curve Deconvolution")
+st.set_page_config("TL Glow Curve Deconvolution")
 
-st.title("Thermoluminescence Glow Curve Deconvolution")
+st.title("TL Glow Curve Deconvolution")
 
 # Initialise session state variables
 if "uploaded" not in st.session_state:
