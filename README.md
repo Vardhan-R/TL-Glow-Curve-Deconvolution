@@ -10,7 +10,7 @@ Thermoluminescence glow curve deconvolution by minimising the figure of merit us
 3. Click the "Upload" button.
 4. The program attempts to identify the number of peaks, locate the maxima of the data and display them.
 5. The initial values of the parameters are determined by these maxmima (as they are computed using numerical methods) and displayed in the graph below.
-6. One can change the parameters provided. **It is strongly recommended to set the initial $T_m$ and $I_m$ values close to the expected maxima of the individual peaks, as this would help with convergence.** See [below]() for more information on how to choose the parameters wisely.
+6. One can change the parameters provided. **It is strongly recommended to set the initial $T_m$ and $I_m$ values close to the expected maxima of the individual peaks, as this would help with convergence.** See [below](https://github.com/Vardhan-R/TL-Glow-Curve-Deconvolution?tab=readme-ov-file#choosing-the-parameters-wisely) for more information on how to choose the parameters wisely.
 6. Click the "Submit" button to update the parameters.
 7. Click the "Execute" button to apply the hosen numerical method and determine the final parameters.
 
