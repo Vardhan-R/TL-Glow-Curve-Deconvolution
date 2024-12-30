@@ -14,7 +14,16 @@ def constraints(params):
     I_m_values = [params[i * 4 + 1] for i in range(n)]
     T_m_values = [params[i * 4 + 2] for i in range(n)]
     E_values = [params[i * 4 + 3] for i in range(n)]
-    return [b - 1 for b in b_values] + [2 - b for b in b_values] + I_m_values + T_m_values + E_values + params[-3:].tolist()
+    # E_values_arr = np.array(E_values)
+    # sorted_E_values_arr = E_values_arr[np.argsort(T_m)]
+    # sorted_E_values_arr[1:]
+    # 463 K, 1.2 eV +/- 0.12
+    # E - \beta_m T
+    prop_coeff_min = (1 - st.session_state.prop_coeff_tol) * 1.2 / 463
+    prop_coeff_max = (1 + st.session_state.prop_coeff_tol) * 1.2 / 463
+    min_prop_constr = [E - prop_coeff_min * T_m for E, T_m in zip(E_values, T_m_values)]
+    max_prop_constr = [prop_coeff_max * T_m - E for E, T_m in zip(E_values, T_m_values)]
+    return [b - 1 for b in b_values] + [2 - b for b in b_values] + I_m_values + T_m_values + E_values + params[-3:].tolist() + min_prop_constr + max_prop_constr
 
 def execute(T: np.ndarray, intensity: np.ndarray, n: int, initial_guess: list[float], scale_factor: float, method: str) -> None:
     for i in range(n):
@@ -43,6 +52,8 @@ def tl_equation(T, b, I_m, T_m, E):
 def multi_tl_equation(T, params):
     n = (len(params) - 3) // 4  # Each component has 4 parameters: b, I_m, T_m, E
     result = params[-3] + params[-2] * np.exp(params[-1] * T)
+    result = 0
+    result = params[-3]
     for i in range(n):
         b, I_m, T_m, E = params[i * 4:(i + 1) * 4]
         result += tl_equation(T, b, I_m, T_m, E)
@@ -144,6 +155,7 @@ if "uploaded" not in st.session_state:
     st.session_state.T_m = [0.0]
     st.session_state.E = [0.0]
     st.session_state.method = "SLSQP"
+    st.session_state.prop_coeff_tol = 0.1
 
 if not st.session_state.uploaded:
     cols = st.columns([3, 1])
@@ -185,6 +197,7 @@ else:
         st.session_state.E = np.random.normal(1, 0.1, st.session_state.n).tolist()
         st.session_state.scale_factor = 500.0
         st.session_state.method = "SLSQP"
+        st.session_state.prop_coeff_tol = 0.1
         st.session_state.located_maxima = True
         st.rerun()
     else:
@@ -209,6 +222,8 @@ else:
             st.session_state.scale_factor = st.number_input("Scale factor", value=st.session_state.scale_factor, key="sc_f", help="Divide the intensity values by this factor for more mathematically precise computations.")
 
             st.session_state.method = st.selectbox("Method for fitting", ["COBYLA", "COBYQA", "SLSQP", "trust-constr"], 2, help="SLSQP is best. COBYQA may not work.")
+
+            st.session_state.prop_coeff_tol = st.number_input("Prop coeff tol", 0.0, 1.0, value=st.session_state.prop_coeff_tol, key="pct", help="E = prop_coeff * T")
 
             # Submit button
             submitted = st.form_submit_button("Submit")
