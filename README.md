@@ -26,7 +26,7 @@ Thermoluminescence glow curve deconvolution by minimising the figure of merit us
 
 ### $I_m$
 
-- If two peaks seem have their maxima close by, then initialise to their corresponding $I_m$ values to be slightly lesser, such that the sum of the peaks would fit the data closely.
+- If two peaks seem have their maxima close by, then initialise their corresponding $I_m$ values to be slightly lesser, such that the sum of the peaks would fit the data closely.
 
 ### $b$ and $E$
 
