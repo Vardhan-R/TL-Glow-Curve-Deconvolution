@@ -52,8 +52,8 @@ def tl_equation(T, b, I_m, T_m, E):
 def multi_tl_equation(T, params):
     n = (len(params) - 3) // 4  # Each component has 4 parameters: b, I_m, T_m, E
     result = params[-3] + params[-2] * np.exp(params[-1] * T)
-    result = 0
-    result = params[-3]
+    # result = 0
+    # result = params[-3]
     for i in range(n):
         b, I_m, T_m, E = params[i * 4:(i + 1) * 4]
         result += tl_equation(T, b, I_m, T_m, E)
@@ -192,7 +192,7 @@ else:
         st.session_state.peak_T, st.session_state.peak_I = findMaxima(st.session_state.T, st.session_state.intensity)
         st.session_state.n = len(st.session_state.peak_T)
         st.session_state.b = [1.6] * st.session_state.n
-        st.session_state.I_m = st.session_state.peak_I.copy()
+        st.session_state.I_m = [0.5 * peak_I for peak_I in st.session_state.peak_I]
         st.session_state.T_m = st.session_state.peak_T.copy()
         st.session_state.E = np.random.normal(1, 0.1, st.session_state.n).tolist()
         st.session_state.scale_factor = 500.0
