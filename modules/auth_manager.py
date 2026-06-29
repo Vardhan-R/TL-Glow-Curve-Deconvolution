@@ -166,14 +166,17 @@ def load_user(username: str, password: str) -> bool:
 
             result = conn.table("users").select("password_hash").eq("username", username).execute()
             if not result.data:
+                st.error("Username not found.")
                 print("Username not found.")
                 return False
 
             stored_password_hash = result.data[0]["password_hash"]
             if not stored_password_hash or hash_password(password) != stored_password_hash:
-                print("Incorrect password.")
+                st.error(f"Incorrect password: {stored_password_hash} != {hash_password(password)}")
+                print(f"Incorrect password: {stored_password_hash} != {hash_password(password)}")
                 return False
         except Exception as e:
+            st.error(f"Failed to load user data: {e}")
             print(f"Failed to load user data: {e}")
             return False
 
