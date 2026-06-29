@@ -1,6 +1,6 @@
 from hashlib import sha256
 from scipy.optimize import minimize
-from streamlit_cookies_manager import EncryptedCookieManager
+from streamlit_cookies_manager_ext import EncryptedCookieManager
 import altair as alt
 import csv
 import numpy as np
@@ -168,7 +168,7 @@ def doLoadStuff() -> None:
                 cookies.save()
                 st.rerun()
     with rgt_col:
-        st.image("images/csv_file_example.png", "Example of the data file", use_container_width=True)
+        st.image("images/csv_file_example.png", "Example of the data file", width="stretch")
 
 # 3
 def doInitialiseParmetersStuff() -> None:

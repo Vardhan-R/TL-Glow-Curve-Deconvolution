@@ -1,6 +1,10 @@
 altair
+cryptography
+matplotlib
 numpy
 pandas
+psycopg[binary]
 scipy
+sqlalchemy
 streamlit
-streamlit_cookies_manager
+streamlit_cookies_manager_ext

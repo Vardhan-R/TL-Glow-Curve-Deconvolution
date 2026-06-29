@@ -1,65 +1,79 @@
-from hashlib import sha256
-from pages.common.cookies_manager import initCookies
-from pages.common.databases_manager import executeSQL
-from scipy.optimize import minimize
-from sqlalchemy import create_engine
-from streamlit_cookies_manager import EncryptedCookieManager
-import altair as alt
-import csv
 import numpy as np
-import os
-import pandas as pd
 import streamlit as st
-import time
 import warnings
 
-# def logout():
-#     cookies["user_id"] = ""
-#     cookies["username"] = ""
-#     if "engine" in st.session_state:
-#         st.session_state.engine.dispose(False)
-#     st.session_state.engine = create_engine("sqlite+pysqlite:///pages/common/databases/server_side.db", echo=True)
-#     st.switch_page("")
+from modules.auth_manager import logout, setup_database
+from modules.cookie_manager import get_cookie_manager
 
-# warnings.filterwarnings("ignore")
 
-cookies = initCookies()
+k = 8.617e-5  # Boltzmann constant in eV / K
 
-# Ensure that the cookies are ready
-if not cookies.ready():
-    st.error("Cookies not initialised yet.")
+warnings.filterwarnings("ignore")
+st.set_page_config("TL Glow Curve Deconvolution", initial_sidebar_state="collapsed")
+st.title("TL Glow Curve Deconvolution")
+
+cm = get_cookie_manager()
+if not cm.ready():
+    st.error("Cookie manager is not ready. Please refresh the page.")
     st.stop()
 
-# st.title("TL Glow Curve Deconvolution")
+if cm.get("init") is None:
+    if not setup_database():
+        st.error("Failed to setup database. Please refresh the page.")
+        st.stop()
+    cm["init"] = "true"
+    cm.save()
 
-if cookies.get("user_id", "") == "":
-    # Not logged in
-    st.title("TL Glow Curve Deconvolution")
+is_logged_in = cm.get("username", "") != ""
 
-    st.page_link("./pages/login.py")
-    st.page_link("./pages/register.py")
-    # st.page_link("./pages/view_tables.py")
-    # st.page_link("./pages/create_tables.py")
-    # st.page_link("./pages/clear_tables.py")
+if is_logged_in:
+    cols = st.columns([4, 1])
+    with cols[0]:
+        st.text(f"Hello, {cm.get('username')}!")
+    with cols[1]:
+        if st.button("Log out"):
+            st.info("Logging out...")
+            logout()
+            st.rerun()
 
-    # if "engine" not in st.session_state:
-    #     st.session_state.engine = create_engine("sqlite+pysqlite:///pages/common/databases/server_side.db", echo=True)
-    # sql = """
-    # CREATE TABLE IF NOT EXISTS users_credentials (
-    #     username VARCHAR(256),
-    #     password_hash VARCHAR(256),
-    #     user_id VARCHAR(256) PRIMARY KEY
-    # )
-    # """
-    # executeSQL(sql, st.session_state.engine, True)
+    if st.session_state.get("uploaded", False):
+        st.switch_page("pages/main.py")
+    else:
+        st.session_state.uploaded = False
+        st.session_state.located_maxima = False
+        st.session_state.n = 1
+        st.session_state.b = [1.6]
+        st.session_state.I_m = [0.0]
+        st.session_state.T_m = [500.0]
+        st.session_state.E = [1.0]
+        st.session_state.scale_factor = 500.0
+        st.session_state.method = "SLSQP"
+        st.session_state.prop_coeff_tol = 0.1
+        st.session_state.dd_ma_window_width = 15
 else:
-    # Logged in
-    st.switch_page("./pages/main.py")
-    # col_1, col_2 = st.columns([4, 1])
-    # with col_1:
-    #     st.title("TL Glow Curve Deconvolution")
-    # with col_2:
-    #     st.button("Logout", on_click=logout)
+    cols = st.columns([3, 1, 1])
+    with cols[1]:
+        st.page_link("pages/register.py", label="Register")
+    with cols[2]:
+        st.page_link("pages/login.py", label="Log in")
 
-    # if "engine" not in st.session_state:
-    #     st.session_state.engine = create_engine(f"sqlite+pysqlite:///pages/common/databases/users/db_{cookies["user_id"]}.db", echo=True)
+cols = st.columns([3, 1])
+
+with cols[0]:
+    st.write("Upload the file containing the data (in csv format only). The file must not have any headers. The first column must contain the temperature values (in K), and the second column must contain the intensity values (in a.u.).")
+    with st.form("upload"):
+        file = st.file_uploader("Upload data file", "csv", help="You must be logged in to upload a file.", disabled=not is_logged_in)
+        submitted = st.form_submit_button("Upload", help="You must be logged in to upload a file.", icon="🚀", disabled=not is_logged_in)
+        if file and submitted:
+        # if is_logged_in:
+            content = file.getvalue()
+            file.close()
+            data = np.array([list(map(np.float64, row.split(","))) for row in content.decode("utf-8").splitlines()])
+            # # with open("temp_file.csv", "r") as fp:
+            #     reader = csv.reader(fp)
+            #     data = np.array([list(map(np.float64, row)) for row in reader])
+            st.session_state.T, st.session_state.intensity = data[:, 0], data[:, 1]
+            st.session_state.uploaded = True
+            st.switch_page("pages/main.py")
+with cols[1]:
+    st.image("images/csv_file_example.png", "Example of the data file", width="stretch")

@@ -170,6 +170,10 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
+# Streamlit secrets
+*.toml
+
+
 # csv files
 *.csv
 

@@ -1,4 +1,4 @@
-from pages.common.databases_manager import executeSQL
+from modules.databases_manager import executeSQL
 from sqlalchemy import create_engine
 import streamlit as st
 

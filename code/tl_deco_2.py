@@ -2,9 +2,7 @@ from scipy.optimize import minimize
 import csv
 import matplotlib.pyplot as plt
 import numpy as np
-import warnings
 
-warnings.filterwarnings("ignore")
 
 # Constants
 k = 8.617e-5  # Boltzmann constant in eV/K

@@ -177,7 +177,7 @@ if not st.session_state.uploaded:
                 st.session_state.uploaded = True
                 st.rerun()
     with cols[1]:
-        st.image("images/csv_file_example.png", "Example of the data file", use_container_width=True)
+        st.image("images/csv_file_example.png", "Example of the data file", width="stretch")
 
     # with open("data.csv", 'r') as fp:
     #     reader = csv.reader(fp)
@@ -254,9 +254,12 @@ else:
                 b, I_m, T_m, E = fitted_params[i * 4:(i + 1) * 4]
                 st.write(f"Peak {i + 1}: b = {b:.2f}, I_m = {I_m:.2f}, T_m = {T_m:.2f}, E = {E:.2f}")
 
-            st.write(f"Offset: {fitted_params[-3]:.2f}")
-            st.write(f"Exp coeff: {fitted_params[-2]:.2f}")
-            st.write(f"Exp power: {fitted_params[-1]:.2f}")
+            offset = fitted_params[-3]
+            exp_coeff = fitted_params[-2]
+            exp_power = fitted_params[-1]
+            st.write(f"Offset: {offset:.2f}")
+            st.write(f"Exp coeff: {exp_coeff:.2f}")
+            st.write(f"Exp power: {exp_power:.2f}")
 
             # Display the final FOM value
             final_fom = fom(fitted_params, st.session_state.T, st.session_state.intensity)
@@ -309,3 +312,17 @@ else:
             chart = c1 + fitted_curve + peaks
 
             st.write(chart)
+
+            # Download the optimised params as CSV
+            csv_data = "b,I_m,T_m,E\n"
+            for i in range(st.session_state.n):
+                b, I_m, T_m, E = fitted_params[i * 4:(i + 1) * 4]
+                csv_data += f"{b},{I_m},{T_m},{E}\n"
+
+            # Add the , Offset, Exp coeff, Exp power, Final FOM
+            csv_data += f",,,Offset,{offset}\n"
+            csv_data += f",,,Exp coeff,{exp_coeff}\n"
+            csv_data += f",,,Exp power,{exp_power}\n"
+            csv_data += f",,,Final FOM,{final_fom}\n"
+
+            st.download_button("Download Optimised Parameters", csv_data, "optimised_params.csv", "text/csv", key="download-csv")
