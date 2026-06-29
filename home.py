@@ -75,5 +75,6 @@ with cols[0]:
             st.session_state.T, st.session_state.intensity = data[:, 0], data[:, 1]
             st.session_state.uploaded = True
             st.switch_page("pages/main.py")
+    st.page_link("https://github.com/Vardhan-R/TL-Glow-Curve-Deconvolution", label="GitHub Repository", icon="🐙")
 with cols[1]:
-    st.image("images/csv_file_example.png", "Example of the data file", width="stretch")
+    st.image("images/csv_file_example.png", "Data file example", width="stretch")

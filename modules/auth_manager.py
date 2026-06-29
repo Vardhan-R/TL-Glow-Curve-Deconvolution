@@ -59,6 +59,9 @@ def setup_database() -> bool:
         except Exception as e:
             print(f"Failed to access Supabase users table: {e}")
             return False
+        finally:
+            if conn:
+                conn.close()
 
 
 def register(username: str, password: str) -> bool:
@@ -107,6 +110,9 @@ def register(username: str, password: str) -> bool:
         except Exception as e:
             print(f"Failed to register user: {e}")
             return False
+        finally:
+            if conn:
+                conn.close()
 
 
 def load_user(username: str, password: str) -> bool:
@@ -122,12 +128,12 @@ def load_user(username: str, password: str) -> bool:
                 cursor.execute("SELECT password_hash FROM users WHERE username = %s", (username,))
                 result = cursor.fetchone()
                 if not result:
-                    print("Username not found.")
+                    print(f"Username {username} not found.")
                     return False
 
                 stored_password_hash = result[0]
                 if not stored_password_hash or hash_password(password) != stored_password_hash:
-                    print("Incorrect password.")
+                    print(f"Incorrect password {password} for username {username}.")
                     return False
 
                 cursor.execute(
@@ -135,10 +141,10 @@ def load_user(username: str, password: str) -> bool:
                     (username, hash_password(password)),
                 )
                 if not cursor.fetchone():
-                    print("Failed to load user data.")
+                    print(f"Failed to load user data for username {username}.")
                     return False
         except Exception as e:
-            print(f"Failed to load user data: {e}")
+            print(f"Failed to load user data for username {username}: {e}")
             return False
         finally:
             if conn:
@@ -149,15 +155,19 @@ def load_user(username: str, password: str) -> bool:
             conn = st.connection("supabase", type=SupabaseConnection)
             result = conn.table("users").select("password_hash").eq("username", username).execute()
             if not result.data:
-                print("Username not found.")
+                print(f"Username {username} not found.")
                 return False
 
             stored_password_hash = result.data[0]["password_hash"]
             if not stored_password_hash or hash_password(password) != stored_password_hash:
+                print(f"Incorrect password {password} for username {username}.")
                 return False
         except Exception as e:
-            print(f"Failed to load user data: {e}")
+            print(f"Failed to load user data for username {username}: {e}")
             return False
+        finally:
+            if conn:
+                conn.close()
 
     cm = get_cookie_manager()
     if not cm.ready():

@@ -100,11 +100,6 @@ with st.form("input_form"):
     if st.form_submit_button("Submit"):
         st.success("Values updated.")
 
-# if st.button("Recompute initial values"):
-#     initialise_from_data_helper()
-#     st.success("Initial values recomputed from the double derivative.")
-#     st.rerun()
-
 exec_button = st.button("Execute")
 if exec_button:
     init_vals = []
