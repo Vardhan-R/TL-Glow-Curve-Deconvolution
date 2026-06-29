@@ -148,6 +148,7 @@ def load_user(username: str, password: str) -> bool:
         try:
             conn = st.connection("supabase", type=SupabaseConnection)
 
+            st.text(conn.table("users").select("*").execute())
             result = conn.table("users").select("password_hash").eq("username", username).execute()
             if not result.data:
                 print("Username not found.")
