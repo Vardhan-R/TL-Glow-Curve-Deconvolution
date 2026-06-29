@@ -22,19 +22,14 @@ def hash_password(password: str) -> str:
 
 def setup_database() -> bool:
     """Initializes the users table."""
-    st.info("Setting up database...")
-    print("Setting up database...")
 
     if st.secrets["db_module"]["module"] == "psycopg":
         try:
             conn = psycopg.connect(**st.secrets["db_config"])
         except Exception as e:
-            st.error(f"Failed to get database connection: {e}")
             print(f"Failed to get database connection: {e}")
             return False
 
-        st.info("Creating users table...")
-        print("Creating users table...")
         try:
             with conn.cursor() as cursor:
                 cursor.execute("""
@@ -46,15 +41,10 @@ def setup_database() -> bool:
                     )
                 """)
 
-            st.info("Committing changes...")
-            print("Committing changes...")
             conn.commit()
-            st.success("Changes committed successfully.")
-            print("Changes committed successfully.")
             return True
         except Exception as e:
             conn.rollback()
-            st.error(f"Failed to create users table: {e}")
             print(f"Failed to create users table: {e}")
             return False
         finally:
@@ -64,15 +54,9 @@ def setup_database() -> bool:
     else:
         try:
             conn = st.connection("supabase", type=SupabaseConnection)
-            result = conn.table("users").select("username").limit(1).execute()
-            st.success("Connected to Supabase. Users table is accessible.")
-            print("Connected to Supabase. Users table is accessible.")
+            conn.table("users").select("username").limit(1).execute()
             return True
         except Exception as e:
-            st.error(
-                f"Failed to access Supabase users table: {e}\n"
-                "Please create the table manually in the Supabase dashboard."
-            )
             print(f"Failed to access Supabase users table: {e}")
             return False
 
@@ -166,17 +150,13 @@ def load_user(username: str, password: str) -> bool:
 
             result = conn.table("users").select("password_hash").eq("username", username).execute()
             if not result.data:
-                st.error("Username not found.")
                 print("Username not found.")
                 return False
 
             stored_password_hash = result.data[0]["password_hash"]
             if not stored_password_hash or hash_password(password) != stored_password_hash:
-                st.error(f"Incorrect password: {stored_password_hash} != {hash_password(password)}")
-                print(f"Incorrect password: {stored_password_hash} != {hash_password(password)}")
                 return False
         except Exception as e:
-            st.error(f"Failed to load user data: {e}")
             print(f"Failed to load user data: {e}")
             return False
 
