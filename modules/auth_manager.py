@@ -25,7 +25,7 @@ def setup_database() -> bool:
     st.info("Setting up database...")
     print("Setting up database...")
 
-    if st.secrets["db_module"] == "psycopg":
+    if st.secrets["db_module"]["module"] == "psycopg":
         try:
             conn = psycopg.connect(**st.secrets["db_config"])
         except Exception as e:
@@ -78,7 +78,7 @@ def setup_database() -> bool:
 
 
 def register(username: str, password: str) -> bool:
-    if st.secrets["db_module"] == "psycopg":
+    if st.secrets["db_module"]["module"] == "psycopg":
         try:
             conn = psycopg.connect(**st.secrets["db_config"])
         except Exception as e:
@@ -126,7 +126,7 @@ def register(username: str, password: str) -> bool:
 
 
 def load_user(username: str, password: str) -> bool:
-    if st.secrets["db_module"] == "psycopg":
+    if st.secrets["db_module"]["module"] == "psycopg":
         try:
             conn = psycopg.connect(**st.secrets["db_config"])
         except Exception as e:
