@@ -29,7 +29,7 @@ is_logged_in = cm.get("username", "") != ""
 if is_logged_in:
     cols = st.columns([4, 1])
     with cols[0]:
-        st.text(f"Hello, {cm.get('username')}!")
+        st.header(f"Hello, {cm.get('username')}!")
     with cols[1]:
         if st.button("Log out"):
             st.info("Logging out...")

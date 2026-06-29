@@ -26,9 +26,10 @@ if cm.get("username", "") == "":
     st.switch_page("home.py")
 
 # Logged in
+st.set_page_config(f"{cm.get('username')}’s Workspace", initial_sidebar_state="collapsed")
+st.header(f"{cm.get('username')}’s Workspace")
+
 cols = st.columns([5, 3, 2])
-with cols[0]:
-    st.text(f"Hello, {cm.get('username')}!")
 with cols[1]:
     if st.button("Back to file upload"):
         st.session_state.uploaded = False
