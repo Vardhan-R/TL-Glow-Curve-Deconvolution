@@ -6,5 +6,6 @@ pandas
 psycopg[binary]
 scipy
 sqlalchemy
+st-supabase-connection
 streamlit
 streamlit_cookies_manager_ext
