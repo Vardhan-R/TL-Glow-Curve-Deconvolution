@@ -21,14 +21,17 @@ def hash_password(password: str) -> str:
 
 def setup_database() -> bool:
     """Initializes the users table."""
+    st.info("Setting up database...")
     print("Setting up database...")
     try:
         conn = psycopg.connect(**st.secrets["db_config"])
     except Exception as e:
+        st.error(f"Failed to get database connection: {e}")
         print(f"Failed to get database connection: {e}")
         return False
 
     # Users table
+    st.info("Creating users table...")
     print("Creating users table...")
     try:
         with conn.cursor() as cursor:
@@ -41,12 +44,15 @@ def setup_database() -> bool:
                 )
             """)
 
+        st.info("Committing changes...")
         print("Committing changes...")
         conn.commit()
+        st.success("Changes committed successfully.")
         print("Changes committed successfully.")
         return True
     except Exception as e:
         conn.rollback()
+        st.error(f"Failed to create users table: {e}")
         print(f"Failed to create users table: {e}")
         return False
     finally:
