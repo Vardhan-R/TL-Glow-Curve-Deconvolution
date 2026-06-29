@@ -21,6 +21,7 @@ def hash_password(password: str) -> str:
 
 def setup_database() -> bool:
     """Initializes the users table."""
+    print("Setting up database...")
     try:
         conn = psycopg.connect(**st.secrets["db_config"])
     except Exception as e:
@@ -28,6 +29,7 @@ def setup_database() -> bool:
         return False
 
     # Users table
+    print("Creating users table...")
     try:
         with conn.cursor() as cursor:
             cursor.execute("""
@@ -39,7 +41,9 @@ def setup_database() -> bool:
                 )
             """)
 
+        print("Committing changes...")
         conn.commit()
+        print("Changes committed successfully.")
         return True
     except Exception as e:
         conn.rollback()
@@ -48,51 +52,6 @@ def setup_database() -> bool:
     finally:
         if conn:
             conn.close()
-
-
-
-# def get_current_user() -> dict | None:
-#     cm = get_cookie_manager()
-#     if not cm.ready():
-#         return None
-
-#     session_id = cm.get("session_id", "")
-#     if not session_id:
-#         return None
-
-#     conn = psycopg.connect(**st.secrets["db_config"])
-#     cursor = conn.cursor()
-#     cursor.execute("""
-#         SELECT users.username, users.role, wallets.tokens
-#         FROM sessions
-#         JOIN users ON sessions.username = users.username
-#         JOIN wallets ON users.username = wallets.username
-#         WHERE sessions.session_id = %s
-#     """, (session_id,))
-#     result = cursor.fetchone()
-#     if not result:
-#         destroy_session(session_id)
-#         return None
-
-#     return {
-#         "username": str(result[0]),
-#         "role": str(result[1]),
-#         "tokens": int(result[2]),
-#     }
-
-
-# def require_login() -> dict:
-#     user = get_current_user()
-#     if user is None:
-#         st.switch_page("pages/403_forbidden.py")
-#     return user
-
-
-# def require_admin() -> dict:
-#     user = require_login()
-#     if user["role"] not in ADMIN_ROLES:
-#         st.switch_page("pages/403_forbidden.py")
-#     return user
 
 
 def register(username: str, password: str) -> bool:
